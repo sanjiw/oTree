@@ -9,7 +9,6 @@ from otree.api import (
     currency_range,
 )
 import random
-import ast
 import numpy as np
 from collections import Counter
 
@@ -82,7 +81,7 @@ class Player(BasePlayer):
                          self.Lotere_6, self.Lotere_7, self.Lotere_8, self.Lotere_9, self.Lotere_10,
                          self.Lotere_11]
 
-        available = ['Lotere 1'] + ast.literal_eval(self.available)
+        available = ['Lotere 1'] + eval(self.available)
         available = [w.replace('_', ' ') for w in available]
         sel_prospect_payoff = []
         for i in range(0, 11):

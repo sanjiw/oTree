@@ -170,7 +170,7 @@ class No4Purchase(Page):
         p = self.participant.vars['all_prospects']
         return {
             'endowment': self.session.config['endowment'],
-            'shown': ast.literal_eval(self.player.available),
+            'shown': eval(self.player.available),
             'round': self.subsession.round_number,
             'playable_rounds': self.session.config['rounds'],
             'list': self.participant.vars['all_prospects'],
@@ -212,12 +212,12 @@ class No4Purchase(Page):
     form_model = 'player'
 
     def get_form_fields(self):
-        fields = ['Lotere_1'] + ast.literal_eval(self.player.available)
+        fields = ['Lotere_1'] + eval(self.player.available)
         return fields
 
     def error_message(self, values):
         print('values is', values)
-        fields = ['Lotere_1'] + ast.literal_eval(self.player.available)
+        fields = ['Lotere_1'] + eval(self.player.available)
         if values[fields[0]] + values[fields[1]] + values[fields[2]] + \
                 values[fields[3]] + values[fields[4]] > int(self.player.endowment):
             return 'Total pilihan Anda melebihi koin yang tersedia!'
@@ -235,7 +235,7 @@ class No5Result(Page):
 
     def vars_for_template(self):
         return {
-            'lists': ast.literal_eval(self.player.sel_prospect_payoff),
+            'lists': eval(self.player.sel_prospect_payoff),
             'round': self.subsession.round_number,
             'playable_rounds': self.session.config['rounds'],
             'util': self.player.util
