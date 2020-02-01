@@ -8,7 +8,6 @@ from otree.api import (
     Currency as c,
     currency_range,
 )
-import random
 import numpy as np
 from collections import Counter
 
@@ -66,7 +65,7 @@ class Player(BasePlayer):
     def goods_rand(self):  # Resulting on lists
         lists = ['Lotere_2', 'Lotere_3', 'Lotere_4', 'Lotere_5', 'Lotere_6',
                  'Lotere_7', 'Lotere_8', 'Lotere_9', 'Lotere_10', 'Lotere_11']
-        shown = random.sample(lists, k=4)
+        shown = np.random.choice(lists, size=4, replace=False)
         self.available = str(shown)
         if self.round_number == 1:
             self.participant.vars['available_hist'] = shown
