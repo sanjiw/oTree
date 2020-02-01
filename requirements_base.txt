@@ -1,5 +1,4 @@
 otree>=2.5.5
 numpy
-ast
 random
 collections
