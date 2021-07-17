@@ -4,16 +4,13 @@ from .models import Constants
 import ast
 import random
 import numpy as np
+import math
 
 
 class No1Introduction(Page):
 
     def is_displayed(self):
         return self.round_number == 1
-
-    def before_next_page(self):
-        return {self.player.set_prospect(),
-                self.subsession.set_session_param()}
 
 
 class No2Instructions1(Page):
@@ -22,92 +19,16 @@ class No2Instructions1(Page):
         return self.round_number == 1
 
     def vars_for_template(self):
-        p = self.participant.vars['all_prospects']
+        p = Constants.prospects
+        p_display = p.to_html()
         return {
-            'endowment': self.session.config['endowment'],
-            'round': self.subsession.round_number,
-            'playable_rounds': self.session.config['rounds'],
-            'prob_A_g1': p[0][1] * 100, 'gain_A_g1': p[0][2], 'prob_B_g1': round(1 - p[0][1], 2) * 100,
-            'gain_B_g1': p[0][3],
-            'show_g1': p[0][5], 'exp_g1': p[0][4], 'noise_g1': p[0][6],
-            'prob_A_g2': p[1][1] * 100, 'gain_A_g2': p[1][2], 'prob_B_g2': round(1 - p[1][1], 2) * 100,
-            'gain_B_g2': p[1][3],
-            'show_g2': p[1][5], 'exp_g2': p[1][4], 'noise_g2': p[1][6],
-            'prob_A_g3': p[2][1] * 100, 'gain_A_g3': p[2][2], 'prob_B_g3': round(1 - p[2][1], 2) * 100,
-            'gain_B_g3': p[2][3],
-            'show_g3': p[2][5], 'exp_g3': p[2][4], 'noise_g3': p[2][6],
-            'prob_A_g4': p[3][1] * 100, 'gain_A_g4': p[3][2], 'prob_B_g4': round(1 - p[3][1], 2) * 100,
-            'gain_B_g4': p[3][3],
-            'show_g4': p[3][5], 'exp_g4': p[3][4], 'noise_g4': p[3][6],
-            'prob_A_g5': p[4][1] * 100, 'gain_A_g5': p[4][2], 'prob_B_g5': round(1 - p[4][1], 2) * 100,
-            'gain_B_g5': p[4][3],
-            'show_g5': p[4][5], 'exp_g5': p[4][4], 'noise_g5': p[4][6],
-            'prob_A_g6': p[5][1] * 100, 'gain_A_g6': p[5][2], 'prob_B_g6': round(1 - p[5][1], 2) * 100,
-            'gain_B_g6': p[5][3],
-            'show_g6': p[5][5], 'exp_g6': p[5][4], 'noise_g6': p[5][6],
-            'prob_A_g7': p[6][1] * 100, 'gain_A_g7': p[6][2], 'prob_B_g7': round(1 - p[6][1], 2) * 100,
-            'gain_B_g7': p[6][3],
-            'show_g7': p[6][5], 'exp_g7': p[6][4], 'noise_g7': p[6][6],
-            'prob_A_g8': p[7][1] * 100, 'gain_A_g8': p[7][2], 'prob_B_g8': round(1 - p[7][1], 2) * 100,
-            'gain_B_g8': p[7][3],
-            'show_g8': p[7][5], 'exp_g8': p[7][4], 'noise_g8': p[7][6],
-            'prob_A_g9': p[8][1] * 100, 'gain_A_g9': p[8][2], 'prob_B_g9': round(1 - p[8][1], 2) * 100,
-            'gain_B_g9': p[8][3],
-            'show_g9': p[8][5], 'exp_g9': p[8][4], 'noise_g9': p[8][6],
-            'prob_A_g10': p[9][1] * 100, 'gain_A_g10': p[9][2], 'prob_B_g10': round(1 - p[9][1], 2) * 100,
-            'gain_B_g10': p[9][3],
-            'show_g10': p[9][5], 'exp_g10': p[9][4], 'noise_g10': p[9][6],
-            'prob_A_g11': p[10][1] * 100, 'gain_A_g11': p[10][2], 'prob_B_g11': round(1 - p[10][1], 2) * 100,
-            'gain_B_g11': p[10][3],
-            'show_g11': p[10][5], 'exp_g11': p[10][4], 'noise_g11': p[10][6],
+            'table' : p_display
         }
-
 
 class No2Instructions2(Page):
 
     def is_displayed(self):
         return self.round_number == 1
-
-    def vars_for_template(self):
-        p = self.participant.vars['all_prospects']
-        return {
-            'endowment': self.session.config['endowment'],
-            'round': self.subsession.round_number,
-            'playable_rounds': self.session.config['rounds'],
-            'prob_A_g1': p[0][1] * 100, 'gain_A_g1': p[0][2], 'prob_B_g1': round(1 - p[0][1], 2) * 100,
-            'gain_B_g1': p[0][3],
-            'show_g1': p[0][5], 'exp_g1': p[0][4], 'noise_g1': p[0][6],
-            'prob_A_g2': p[1][1] * 100, 'gain_A_g2': p[1][2], 'prob_B_g2': round(1 - p[1][1], 2) * 100,
-            'gain_B_g2': p[1][3],
-            'show_g2': p[1][5], 'exp_g2': p[1][4], 'noise_g2': p[1][6],
-            'prob_A_g3': p[2][1] * 100, 'gain_A_g3': p[2][2], 'prob_B_g3': round(1 - p[2][1], 2) * 100,
-            'gain_B_g3': p[2][3],
-            'show_g3': p[2][5], 'exp_g3': p[2][4], 'noise_g3': p[2][6],
-            'prob_A_g4': p[3][1] * 100, 'gain_A_g4': p[3][2], 'prob_B_g4': round(1 - p[3][1], 2) * 100,
-            'gain_B_g4': p[3][3],
-            'show_g4': p[3][5], 'exp_g4': p[3][4], 'noise_g4': p[3][6],
-            'prob_A_g5': p[4][1] * 100, 'gain_A_g5': p[4][2], 'prob_B_g5': round(1 - p[4][1], 2) * 100,
-            'gain_B_g5': p[4][3],
-            'show_g5': p[4][5], 'exp_g5': p[4][4], 'noise_g5': p[4][6],
-            'prob_A_g6': p[5][1] * 100, 'gain_A_g6': p[5][2], 'prob_B_g6': round(1 - p[5][1], 2) * 100,
-            'gain_B_g6': p[5][3],
-            'show_g6': p[5][5], 'exp_g6': p[5][4], 'noise_g6': p[5][6],
-            'prob_A_g7': p[6][1] * 100, 'gain_A_g7': p[6][2], 'prob_B_g7': round(1 - p[6][1], 2) * 100,
-            'gain_B_g7': p[6][3],
-            'show_g7': p[6][5], 'exp_g7': p[6][4], 'noise_g7': p[6][6],
-            'prob_A_g8': p[7][1] * 100, 'gain_A_g8': p[7][2], 'prob_B_g8': round(1 - p[7][1], 2) * 100,
-            'gain_B_g8': p[7][3],
-            'show_g8': p[7][5], 'exp_g8': p[7][4], 'noise_g8': p[7][6],
-            'prob_A_g9': p[8][1] * 100, 'gain_A_g9': p[8][2], 'prob_B_g9': round(1 - p[8][1], 2) * 100,
-            'gain_B_g9': p[8][3],
-            'show_g9': p[8][5], 'exp_g9': p[8][4], 'noise_g9': p[8][6],
-            'prob_A_g10': p[9][1] * 100, 'gain_A_g10': p[9][2], 'prob_B_g10': round(1 - p[9][1], 2) * 100,
-            'gain_B_g10': p[9][3],
-            'show_g10': p[9][5], 'exp_g10': p[9][4], 'noise_g10': p[9][6],
-            'prob_A_g11': p[10][1] * 100, 'gain_A_g11': p[10][2], 'prob_B_g11': round(1 - p[10][1], 2) * 100,
-            'gain_B_g11': p[10][3],
-            'show_g11': p[10][5], 'exp_g11': p[10][4], 'noise_g11': p[10][6],
-        }
 
 
 class No3Start(Page):
@@ -115,50 +36,8 @@ class No3Start(Page):
     def is_displayed(self):
         return self.round_number <= self.session.config['rounds']
 
-    def vars_for_template(self):
-        p = self.participant.vars['all_prospects']
-        return {
-            'round': self.subsession.round_number,
-            'playable_rounds': self.session.config['rounds'],
-            'list': self.participant.vars['all_prospects'],
-            'prob_A_g1': p[0][1] * 100, 'gain_A_g1': p[0][2], 'prob_B_g1': round(1 - p[0][1], 2) * 100,
-            'gain_B_g1': p[0][3],
-            'show_g1': p[0][5], 'exp_g1': p[0][4], 'noise_g1': p[0][6],
-            'prob_A_g2': p[1][1] * 100, 'gain_A_g2': p[1][2], 'prob_B_g2': round(1 - p[1][1], 2) * 100,
-            'gain_B_g2': p[1][3],
-            'show_g2': p[1][5], 'exp_g2': p[1][4], 'noise_g2': p[1][6],
-            'prob_A_g3': p[2][1] * 100, 'gain_A_g3': p[2][2], 'prob_B_g3': round(1 - p[2][1], 2) * 100,
-            'gain_B_g3': p[2][3],
-            'show_g3': p[2][5], 'exp_g3': p[2][4], 'noise_g3': p[2][6],
-            'prob_A_g4': p[3][1] * 100, 'gain_A_g4': p[3][2], 'prob_B_g4': round(1 - p[3][1], 2) * 100,
-            'gain_B_g4': p[3][3],
-            'show_g4': p[3][5], 'exp_g4': p[3][4], 'noise_g4': p[3][6],
-            'prob_A_g5': p[4][1] * 100, 'gain_A_g5': p[4][2], 'prob_B_g5': round(1 - p[4][1], 2) * 100,
-            'gain_B_g5': p[4][3],
-            'show_g5': p[4][5], 'exp_g5': p[4][4], 'noise_g5': p[4][6],
-            'prob_A_g6': p[5][1] * 100, 'gain_A_g6': p[5][2], 'prob_B_g6': round(1 - p[5][1], 2) * 100,
-            'gain_B_g6': p[5][3],
-            'show_g6': p[5][5], 'exp_g6': p[5][4], 'noise_g6': p[5][6],
-            'prob_A_g7': p[6][1] * 100, 'gain_A_g7': p[6][2], 'prob_B_g7': round(1 - p[6][1], 2) * 100,
-            'gain_B_g7': p[6][3],
-            'show_g7': p[6][5], 'exp_g7': p[6][4], 'noise_g7': p[6][6],
-            'prob_A_g8': p[7][1] * 100, 'gain_A_g8': p[7][2], 'prob_B_g8': round(1 - p[7][1], 2) * 100,
-            'gain_B_g8': p[7][3],
-            'show_g8': p[7][5], 'exp_g8': p[7][4], 'noise_g8': p[7][6],
-            'prob_A_g9': p[8][1] * 100, 'gain_A_g9': p[8][2], 'prob_B_g9': round(1 - p[8][1], 2) * 100,
-            'gain_B_g9': p[8][3],
-            'show_g9': p[8][5], 'exp_g9': p[8][4], 'noise_g9': p[8][6],
-            'prob_A_g10': p[9][1] * 100, 'gain_A_g10': p[9][2], 'prob_B_g10': round(1 - p[9][1], 2) * 100,
-            'gain_B_g10': p[9][3],
-            'show_g10': p[9][5], 'exp_g10': p[9][4], 'noise_g10': p[9][6],
-            'prob_A_g11': p[10][1] * 100, 'gain_A_g11': p[10][2], 'prob_B_g11': round(1 - p[10][1], 2) * 100,
-            'gain_B_g11': p[10][3],
-            'show_g11': p[10][5], 'exp_g11': p[10][4], 'noise_g11': p[10][6],
-        }
-
     def before_next_page(self):
-        return {self.player.goods_rand(),
-                self.player.set_player_param()}
+        return {self.player.set_player_param()}
 
 
 class No4Purchase(Page):
@@ -167,65 +46,24 @@ class No4Purchase(Page):
         return self.round_number <= self.session.config['rounds']
 
     def vars_for_template(self):
-        p = self.participant.vars['all_prospects']
+        p = self.participant.vars["displayed_prospects"]
         return {
-            'endowment': self.session.config['endowment'],
-            'shown': eval(self.player.available),
-            'round': self.subsession.round_number,
-            'playable_rounds': self.session.config['rounds'],
-            'list': self.participant.vars['all_prospects'],
-            'prob_A_g1': p[0][1] * 100, 'gain_A_g1': p[0][2], 'prob_B_g1': round(1 - p[0][1], 2) * 100,
-            'gain_B_g1': p[0][3],
-            'show_g1': p[0][5], 'exp_g1': p[0][4], 'noise_g1': p[0][6],
-            'prob_A_g2': p[1][1] * 100, 'gain_A_g2': p[1][2], 'prob_B_g2': round(1 - p[1][1], 2) * 100,
-            'gain_B_g2': p[1][3],
-            'show_g2': p[1][5], 'exp_g2': p[1][4], 'noise_g2': p[1][6],
-            'prob_A_g3': p[2][1] * 100, 'gain_A_g3': p[2][2], 'prob_B_g3': round(1 - p[2][1], 2) * 100,
-            'gain_B_g3': p[2][3],
-            'show_g3': p[2][5], 'exp_g3': p[2][4], 'noise_g3': p[2][6],
-            'prob_A_g4': p[3][1] * 100, 'gain_A_g4': p[3][2], 'prob_B_g4': round(1 - p[3][1], 2) * 100,
-            'gain_B_g4': p[3][3],
-            'show_g4': p[3][5], 'exp_g4': p[3][4], 'noise_g4': p[3][6],
-            'prob_A_g5': p[4][1] * 100, 'gain_A_g5': p[4][2], 'prob_B_g5': round(1 - p[4][1], 2) * 100,
-            'gain_B_g5': p[4][3],
-            'show_g5': p[4][5], 'exp_g5': p[4][4], 'noise_g5': p[4][6],
-            'prob_A_g6': p[5][1] * 100, 'gain_A_g6': p[5][2], 'prob_B_g6': round(1 - p[5][1], 2) * 100,
-            'gain_B_g6': p[5][3],
-            'show_g6': p[5][5], 'exp_g6': p[5][4], 'noise_g6': p[5][6],
-            'prob_A_g7': p[6][1] * 100, 'gain_A_g7': p[6][2], 'prob_B_g7': round(1 - p[6][1], 2) * 100,
-            'gain_B_g7': p[6][3],
-            'show_g7': p[6][5], 'exp_g7': p[6][4], 'noise_g7': p[6][6],
-            'prob_A_g8': p[7][1] * 100, 'gain_A_g8': p[7][2], 'prob_B_g8': round(1 - p[7][1], 2) * 100,
-            'gain_B_g8': p[7][3],
-            'show_g8': p[7][5], 'exp_g8': p[7][4], 'noise_g8': p[7][6],
-            'prob_A_g9': p[8][1] * 100, 'gain_A_g9': p[8][2], 'prob_B_g9': round(1 - p[8][1], 2) * 100,
-            'gain_B_g9': p[8][3],
-            'show_g9': p[8][5], 'exp_g9': p[8][4], 'noise_g9': p[8][6],
-            'prob_A_g10': p[9][1] * 100, 'gain_A_g10': p[9][2], 'prob_B_g10': round(1 - p[9][1], 2) * 100,
-            'gain_B_g10': p[9][3],
-            'show_g10': p[9][5], 'exp_g10': p[9][4], 'noise_g10': p[9][6],
-            'prob_A_g11': p[10][1] * 100, 'gain_A_g11': p[10][2], 'prob_B_g11': round(1 - p[10][1], 2) * 100,
-            'gain_B_g11': p[10][3],
-            'show_g11': p[10][5], 'exp_g11': p[10][4], 'noise_g11': p[10][6],
+            'lot_1': p.iloc[0,2],'gain_A_1': p.iloc[0,3],'prob_A_1': p.iloc[0,4],'gain_B_1': p.iloc[0,5],'prob_B_1': p.iloc[0,6],'rel_1': p.iloc[0,7],
+            'lot_2': p.iloc[1,2],'gain_A_2': p.iloc[1,3],'prob_A_2': p.iloc[1,4],'gain_B_2': p.iloc[1,5],'prob_B_2': p.iloc[1,6],'rel_2': p.iloc[1,7],
+            'lot_3': p.iloc[2,2],'gain_A_3': p.iloc[2,3],'prob_A_3': p.iloc[2,4],'gain_B_3': p.iloc[2,5],'prob_B_3': p.iloc[2,6],'rel_3': p.iloc[2,7],
+            'lot_4': p.iloc[3,2],'gain_A_4': p.iloc[3,3],'prob_A_4': p.iloc[3,4],'gain_B_4': p.iloc[3,5],'prob_B_4': p.iloc[3,6],'rel_4': p.iloc[3,7],
+            'lot_5': p.iloc[4,2],'gain_A_5': p.iloc[4,3],'prob_A_5': p.iloc[4,4],'gain_B_5': p.iloc[4,5],'prob_B_5': p.iloc[4,6],'rel_5': p.iloc[4,7],
+            'df': self.participant.vars["prospect_table"]
         }
 
     form_model = 'player'
 
     def get_form_fields(self):
-        fields = ['Lotere_1'] + eval(self.player.available)
+        fields = ['Lotere_A', 'Lotere_B', 'Lotere_C', 'Lotere_D', 'Lotere_E']
         return fields
 
-    def error_message(self, values):
-        print('values is', values)
-        fields = ['Lotere_1'] + eval(self.player.available)
-        if values[fields[0]] + values[fields[1]] + values[fields[2]] + \
-                values[fields[3]] + values[fields[4]] > int(self.player.endowment):
-            return 'Total pilihan Anda melebihi koin yang tersedia!'
-
     def before_next_page(self):
-        return {self.player.set_util(),
-                self.player.purchase_counter(),
-                self.player.update_prospect()}
+        return {self.player.payoff_realizer()}
 
 
 class No5Result(Page):
@@ -234,17 +72,15 @@ class No5Result(Page):
         return self.round_number <= self.session.config['rounds']
 
     def vars_for_template(self):
+        df = self.participant.vars["displayed_prospects"][["x1","x2","Allocation","A_or_B","payoff"]]
         return {
-            'lists': eval(self.player.sel_prospect_payoff),
-            'round': self.subsession.round_number,
-            'playable_rounds': self.session.config['rounds'],
-            'util': self.player.util
+            'A1': df.iloc[0, 0], 'B1': df.iloc[0, 1], 'C1': df.iloc[0, 2], 'D1': df.iloc[0, 3], 'E1': df.iloc[0, 4],
+            'A2': df.iloc[1, 0], 'B2': df.iloc[1, 1], 'C2': df.iloc[1, 2], 'D2': df.iloc[1, 3], 'E2': df.iloc[1, 4],
+            'A3': df.iloc[2, 0], 'B3': df.iloc[2, 1], 'C3': df.iloc[2, 2], 'D3': df.iloc[2, 3], 'E3': df.iloc[2, 4],
+            'A4': df.iloc[3, 0], 'B4': df.iloc[3, 1], 'C4': df.iloc[3, 2], 'D4': df.iloc[3, 3], 'E4': df.iloc[3, 4],
+            'A5': df.iloc[4, 0], 'B5': df.iloc[4, 1], 'C5': df.iloc[4, 2], 'D5': df.iloc[4, 3], 'E5': df.iloc[4, 4],
+            'payoff_thisround': self.player.payoff_thisround,
         }
-
-    def before_next_page(self):
-        return {self.player.set_util(),
-                self.player.purchase_counter(),
-                self.player.update_prospect()}
 
 
 class No6EndQuestionnaire(Page):
@@ -252,27 +88,11 @@ class No6EndQuestionnaire(Page):
     def is_displayed(self):
         return self.round_number == self.session.config['rounds']
 
-    form_model = "player"
-    form_fields = ["Name", "Age", "Gender"]
-
-    def before_next_page(self):
-        if self.round_number == self.session.config['rounds']:
-            return {
-                self.player.set_payoff()
-            }
-
 
 class No6EndResult(Page):
 
     def is_displayed(self):
         return self.round_number == self.session.config['rounds']
-
-    def vars_for_template(self):
-        return {
-            'payoff': self.player.payoff
-        }
-
-
 
 
 page_sequence = [No1Introduction,

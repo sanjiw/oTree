@@ -9,6 +9,8 @@ from otree.api import (
     currency_range,
 )
 import numpy as np
+import math
+import pandas as pd
 from collections import Counter
 
 author = 'Putu Sanjiwacika Wibisana'
@@ -19,18 +21,16 @@ Adaptation of Preference Discovery by Delaney, Jacobson and Moenig (2018) for ri
 
 
 class Constants(BaseConstants):
-    name_in_url = 'preference_discovery'
+    name_in_url = 'preference_discovery_v2'
     players_per_group = None
     num_rounds = 20
     table = 'preference_discovery/Float-Table.html'
+    with open('preference_discovery/Lottery.csv', encoding="utf-8") as file:
+        prospects = pd.read_csv(file)
 
 
 class Subsession(BaseSubsession):
-
-    def set_session_param(self):
-        self.playable_rounds = self.session.config['rounds']
-
-    playable_rounds = models.IntegerField()
+    pass
 
 
 class Group(BaseGroup):
@@ -40,118 +40,48 @@ class Group(BaseGroup):
 class Player(BasePlayer):
 
     def set_player_param(self):
-        self.endowment = self.session.config['endowment']
-
-    def set_prospect(self):  # Resulted in Nested Lists
-        list_prospect = ['Lotere 1', 'Lotere 2', 'Lotere 3', 'Lotere 4', 'Lotere 5', 'Lotere 6',
-                         'Lotere 7', 'Lotere 8', 'Lotere 9', 'Lotere 10', 'Lotere 11']  # index 0
-        self.participant.vars['list_purchase'] = list_prospect
-        list_probs = [1, 0.3, 0.45, 0.7, 0.8, 0.6, 0.5, 0.9, 0.1, 0.2, 0.05]  # index 1
-        list_outcome = [60, 140, 130, 150, 115, 120, 130, 140, 120, 155, 175]  # index 2
-        list_negate = [60, 70, 80, 40, 100, 95, 75, 40, 95, 80, 70]  # index 3
-        exp_value = []  # index 4
-        for i in range(0, 11):
-            x1 = round((list_probs[i] * list_outcome[i]) + ((1 - list_probs[i]) * list_negate[i]), 0)
-            exp_value = exp_value + [x1]
-        list_show = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # index 5
-        list_win = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # index 6
-        utility = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # index 7
-        lists = [list_prospect, list_probs, list_outcome, list_negate, exp_value, list_show, list_win, utility]
-        all_prospects = []
-        for i in range(0, 11):
-            all_prospects.append([item[i] for item in lists])
-        self.participant.vars['all_prospects'] = all_prospects
-
-    def goods_rand(self):  # Resulting on lists
-        lists = ['Lotere_2', 'Lotere_3', 'Lotere_4', 'Lotere_5', 'Lotere_6',
-                 'Lotere_7', 'Lotere_8', 'Lotere_9', 'Lotere_10', 'Lotere_11']
-        shown = list(np.random.choice(lists, size=4, replace=False))
-        self.available = str(shown)
         if self.round_number == 1:
-            self.participant.vars['available_hist'] = shown
+            self.participant.vars["prospect_table"] = Constants.prospects
         else:
-            self.participant.vars['available_hist'] = self.participant.vars['available_hist'] + shown
-        self.available_hist = str(self.participant.vars['available_hist'])
+            pass
+        self.participant.vars["random_indexes"] = [np.random.choice(list(range(0,5))),
+                                                   np.random.choice(list(range(5,10))),
+                                                   np.random.choice(list(range(10,15))),
+                                                   np.random.choice(list(range(15,20))),
+                                                   20]
+        self.participant.vars["displayed_lotteries"] = list(self.participant.vars["prospect_table"].loc[self.participant.vars["random_indexes"],"Index"])
+        self.participant.vars["displayed_prospects"] = self.participant.vars["prospect_table"].loc[self.participant.vars["random_indexes"],:]
+        self.displayed_lotteries = str(list(self.participant.vars["displayed_lotteries"]))
 
-    def set_util(self):
+    def payoff_realizer(self):
+        df = self.participant.vars["displayed_prospects"]
+        df[["Allocation"]] = [self.Lotere_A, self.Lotere_B, self.Lotere_C, self.Lotere_D, self.Lotere_E]                ### df[["Allocation"]] = [0,0,2,1,2]
+        df[["payoff"]] = [0, 0, 0, 0, 0]
+        for i in self.participant.vars["random_indexes"]:
+            df.loc[i,"A_or_B"] = np.random.choice(["A","B"], p=[df.loc[i,"p1"],df.loc[i,"p2"]])
+            df.loc[i,"payoff"] = df.loc[i,"x1"] * df.loc[i,"Allocation"] if df.loc[i,"A_or_B"] == "A" else df.loc[i,"x2"] * df.loc[i,"Allocation"]
+        self.payoff_thisround = int(df[["payoff"]].sum())
+        self.participant.vars["prospect_table"].update(df)
+        for i in range(0,len(self.participant.vars["prospect_table"])):
+            if self.participant.vars["prospect_table"].loc[i,"A_or_B"] != "X":
+                if self.participant.vars["prospect_table"].loc[i,"A_or_B"] == "A":
+                    self.participant.vars["prospect_table"].loc[i, "p1"] = 1
+                    self.participant.vars["prospect_table"].loc[i, "p2"] = 0
+                elif self.participant.vars["prospect_table"].loc[i,"A_or_B"] == "B":
+                    self.participant.vars["prospect_table"].loc[i, "p1"] = 0
+                    self.participant.vars["prospect_table"].loc[i, "p2"] = 1
+            else:
+                pass
+        self.participant.vars["displayed_prospects"] = df
 
-        p = self.participant.vars['all_prospects']
-        list_prospect = [self.Lotere_1, self.Lotere_2, self.Lotere_3, self.Lotere_4, self.Lotere_5,
-                         self.Lotere_6, self.Lotere_7, self.Lotere_8, self.Lotere_9, self.Lotere_10,
-                         self.Lotere_11]
+    payoff_thisround = models.IntegerField()
+    displayed_lotteries = models.StringField()
 
-        available = ['Lotere 1'] + eval(self.available)
-        available = [w.replace('_', ' ') for w in available]
-        sel_prospect_payoff = []
-        for i in range(0, 11):
-            p[i][7] = np.random.choice(["Win", "Lose"], p=[p[i][1], 1 - p[i][1]])  # Win or not win condition
-            if p[i][0] in available:
-                if p[i][7] == "Win" and list_prospect[i] > 0:
-                    sel_prospect_payoff.append([p[i][0], p[i][7], list_prospect[i], p[i][2], list_prospect[i] * p[i][2]])
-                elif p[i][7] == "Lose" and list_prospect[i] > 0:
-                    sel_prospect_payoff.append([p[i][0], p[i][7], list_prospect[i], p[i][3], list_prospect[i] * p[i][3]])
-                elif list_prospect[i] == 0:
-                    pass
-        self.sel_prospect_payoff = str(sel_prospect_payoff)
-        self.util = 0
-        for i in range(0, len(sel_prospect_payoff)):
-            self.util += sel_prospect_payoff[i][2] * sel_prospect_payoff[i][3]
-
-        if self.round_number == 1:
-            self.participant.vars['payoff_vector'] = [self.util]
-        elif self.round_number != 1:
-            self.participant.vars['payoff_vector'].append(self.util)
-
-    def purchase_counter(self):  # Resulting in dictionary
-        list_full = ['Lotere 1', 'Lotere 2', 'Lotere 3', 'Lotere 4', 'Lotere 5', 'Lotere 6',
-                     'Lotere 7', 'Lotere 8', 'Lotere 9', 'Lotere 10', 'Lotere 11']
-        list_num = [self.Lotere_1, self.Lotere_2, self.Lotere_3, self.Lotere_4, self.Lotere_5,
-                    self.Lotere_6, self.Lotere_7, self.Lotere_8, self.Lotere_9, self.Lotere_10,
-                    self.Lotere_11]
-        dictionary = dict(zip(list_full, list_num))
-        if self.round_number == 1:
-            self.participant.vars['purchase_hist'] = dictionary
-        else:
-            self.participant.vars['purchase_hist'] = Counter(self.participant.vars['purchase_hist']) + \
-                                                     Counter(dictionary)
-        self.purchase_hist = str(self.participant.vars['purchase_hist'])
-
-    def update_prospect(self):
-        list_purchase = self.participant.vars['list_purchase']  # List of prospects purchasable
-        hist = self.participant.vars['purchase_hist']  # Dictionary
-        p = self.participant.vars['all_prospects']  # Nested List
-        for i in p:
-            if hist[i[0]] > 0:
-                i[5] = 1
-            elif (hist[i[0]] == 0) & (i[0] != 'Lotere 1'):
-                i[5] = 0
-        self.participant.vars['all_prospects'] = p
-        self.all_prospects = str(p)
-
-    def set_payoff(self):
-        self.payoff = sum(self.participant.vars['payoff_vector'])
-
-    all_prospects = models.StringField()
-    available_hist = models.StringField()
-    purchase_hist = models.StringField()
-    available = models.StringField()
-    util = models.FloatField(initial=0)
-    endowment = models.IntegerField()
-    sel_prospect_payoff = models.StringField()
-
-    ## Lotere is the Indonesian word for 'prospect'
-
-    Lotere_1 = models.IntegerField(min=0, max=10, initial=0, label="Lotere 1")
-    Lotere_2 = models.IntegerField(min=0, max=10, initial=0, label="Lotere 2")
-    Lotere_3 = models.IntegerField(min=0, max=10, initial=0, label="Lotere 3")
-    Lotere_4 = models.IntegerField(min=0, max=10, initial=0, label="Lotere 4")
-    Lotere_5 = models.IntegerField(min=0, max=10, initial=0, label="Lotere 5")
-    Lotere_6 = models.IntegerField(min=0, max=10, initial=0, label="Lotere 6")
-    Lotere_7 = models.IntegerField(min=0, max=10, initial=0, label="Lotere 7")
-    Lotere_8 = models.IntegerField(min=0, max=10, initial=0, label="Lotere 8")
-    Lotere_9 = models.IntegerField(min=0, max=10, initial=0, label="Lotere 9")
-    Lotere_10 = models.IntegerField(min=0, max=10, initial=0, label="Lotere 10")
-    Lotere_11 = models.IntegerField(min=0, max=10, initial=0, label="Lotere 11")
+    Lotere_A = models.IntegerField(min=0, max=10, initial=0)
+    Lotere_B = models.IntegerField(min=0, max=10, initial=0)
+    Lotere_C = models.IntegerField(min=0, max=10, initial=0)
+    Lotere_D = models.IntegerField(min=0, max=10, initial=0)
+    Lotere_E = models.IntegerField(min=0, max=10, initial=0)
 
     ## Vars for questionnaire
 

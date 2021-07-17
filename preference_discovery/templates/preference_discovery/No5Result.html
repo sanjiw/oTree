@@ -2,47 +2,93 @@
 {% load otree static %}
 
 {% block title %}
-    Hasil Ronde Ke-{{ round }} dari {{ playable_rounds }}
+    Round
 {% endblock %}
 
 {% block content %}
 
-    Anda mendapatkan <b>{{util|floatformat:0}} poin</b> di ronde ini. Berikut rincian lotere Anda:
+    Anda mendapatkan {{payoff_thisround}} poin di ronde ini. Berikut rincian lotere Anda:
+    <br>
+    <br>
     <style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;border-color:#ccc;}
-.tg td{padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#fff;}
-.tg th{font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#ccc;color:#333;background-color:#f0f0f0;}
-.tg .tg-baqh{text-align:center;vertical-align:top}
-</style>
-    <div class="card" style="text-align:center">
-        <div class="card-body">
-            <center>
-               <table class="tg">
-                  <tr>
-                    <th class="tg-6qw1">﻿Jenis Lotere</th>
-                    <th class="tg-6qw1">﻿Menang/Kalah</th>
-                    <th class="tg-6qw1">Jumlah yang Ditukar</th>
-                    <th class="tg-6qw1">Hasil per Koin</th>
-                    <th class="tg-6qw1">Total Hasil per Lotere</th>
-                  </tr>
-                  {% for i, j, k, l, m in lists %}
-                  <tr>
-                    <td class="tg-baqh">{{i}}</td>
-                    <td class="tg-baqh">{%if j == "Win" %}Menang{% else %}Kalah{% endif %}</td>
-                    <td class="tg-baqh">{{k}}</td>
-                    <td class="tg-baqh">{{l}}</td>
-                    <td class="tg-baqh">{{m}}</td>
-                  </tr>
-                  {% endfor %}
-                  <tr>
-                    <td class="tg-baqh" colspan="4">Total</td>
-                    <td class="tg-baqh"><b>{{util|floatformat:0}} poin</b></td>
-                  </tr>
-               </table>
-            </center>
-        </div>
-    </div>
-    <br>Tekan tombol 'Lanjut' untuk masuk ke tahap berikutnya.
+    .tg  {border-collapse:collapse;border-spacing:0;}
+    .tg td{border-style:solid;border-width:0px;font-size:14px;overflow:hidden;
+      padding:10px 5px;word-break:normal;}
+    .tg th{border-style:solid;border-width:0px;font-size:14px;font-weight:normal;
+      overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg .tg-4n2o{border-color:#c0c0c0;font-weight:bold;text-align:center;vertical-align:top}
+    .tg .tg-fzdr{border-color:#c0c0c0;text-align:center;vertical-align:top}
+    </style>
+    <table class="tg" style="undefined;table-layout: fixed; width: 939px">
+    <colgroup>
+    <col style="width: 161px">
+    <col style="width: 110px">
+    <col style="width: 110px">
+    <col style="width: 91px">
+    <col style="width: 166px">
+    <col style="width: 190px">
+    <col style="width: 111px">
+    </colgroup>
+    <thead>
+      <tr>
+        <th class="tg-4n2o"></th>
+        <th class="tg-fzdr">Kemungkinan A</th>
+        <th class="tg-fzdr">Kemungkinan B</th>
+        <th class="tg-fzdr">Alokasi Anda</th>
+        <th class="tg-fzdr">Kemungkinan yang muncul</th>
+        <th class="tg-fzdr">Hitungan Poin</th>
+        <th class="tg-fzdr">Poin Perolehan </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="tg-4n2o">Alternatif 1:</td>
+        <td class="tg-fzdr">{{A1}}</td>
+        <td class="tg-fzdr">{{B1}}</td>
+        <td class="tg-fzdr">{{C1}}</td>
+        <td class="tg-fzdr">{% if C1 > 0 %}{{D1}}{% else %}-{% endif %}</td>
+        <td class="tg-fzdr">{% if D1 == 'A' %} {{C1}} * {{A1}} {% elif D1 == 'B' %} {{C1}} * {{B1}}{% endif %}</td>
+        <td class="tg-fzdr">{{E1}}</td>
+      </tr>
+      <tr>
+        <td class="tg-4n2o">Alternatif 2:</td>
+        <td class="tg-fzdr">{{A2}}</td>
+        <td class="tg-fzdr">{{B2}}</td>
+        <td class="tg-fzdr">{{C2}}</td>
+        <td class="tg-fzdr">{% if C2 > 0 %}{{D2}}{% else %}-{% endif %}</td>
+        <td class="tg-fzdr">{% if D2 == 'A' %} {{C2}} * {{A2}} {% elif D2 == 'B' %} {{C2}} * {{B2}}{% endif %}</td>
+        <td class="tg-fzdr">{{E2}}</td>
+      </tr>
+      <tr>
+        <td class="tg-4n2o">Alternatif 3:</td>
+        <td class="tg-fzdr">{{A3}}</td>
+        <td class="tg-fzdr">{{B3}}</td>
+        <td class="tg-fzdr">{{C3}}</td>
+        <td class="tg-fzdr">{% if C3 > 0 %}{{D3}}{% else %}-{% endif %}</td>
+        <td class="tg-fzdr">{% if D3 == 'A' %} {{C3}} * {{A3}} {% elif D3 == 'B' %} {{C3}} * {{B3}}{% endif %}</td>
+        <td class="tg-fzdr">{{E3}}</td>
+      </tr>
+      <tr>
+        <td class="tg-4n2o">Alternatif 4:</td>
+        <td class="tg-fzdr">{{A4}}</td>
+        <td class="tg-fzdr">{{B4}}</td>
+        <td class="tg-fzdr">{{C4}}</td>
+        <td class="tg-fzdr">{% if C4 > 0 %}{{D4}}{% else %}-{% endif %}</td>
+        <td class="tg-fzdr">{% if D4 == 'A' %} {{C4}} * {{A4}} {% elif D4 == 'B' %} {{C4}} * {{B4}}{% endif %}</td>
+        <td class="tg-fzdr">{{E4}}</td>
+      </tr>
+      <tr>
+        <td class="tg-4n2o">Alternatif 5:</td>
+        <td class="tg-fzdr">{{A5}}</td>
+        <td class="tg-fzdr">{{B5}}</td>
+        <td class="tg-fzdr">{{C5}}</td>
+        <td class="tg-fzdr">{% if C5 > 0 %}{{D5}}{% else %}-{% endif %}</td>
+        <td class="tg-fzdr">{% if D5 == 'A' %} {{C5}} * {{A5}} {% elif D5 == 'B' %} {{C5}} * {{B5}}{% endif %}</td>
+        <td class="tg-fzdr">{{E5}}</td>
+      </tr>
+    </tbody>
+    </table>
+
     <br>
     <br>
     <button class="otree-btn-next btn btn-primary next-button otree-next-button">Lanjut</button>
