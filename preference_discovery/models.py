@@ -9,9 +9,8 @@ from otree.api import (
     currency_range,
 )
 import numpy as np
-import math
 import pandas as pd
-from collections import Counter
+from random import sample
 
 author = 'Putu Sanjiwacika Wibisana'
 
@@ -39,17 +38,18 @@ class Group(BaseGroup):
 class Player(BasePlayer):
 
     def set_player_param(self):
+        # round settings
+        self.training_round = 1 if self.round_number <= self.session.config["training_rounds"] else 0
         if self.round_number == 1:
             self.participant.vars["prospect_table"] = Constants.prospects
             self.endowment = self.session.config["endowment"]
+            self.participant.vars["payoff_vector"] = list()
         elif self.round_number == self.session.config["training_rounds"] + 1:
             self.participant.vars["prospect_table"] = Constants.prospects
-            self.endowment = self.session.config["endowment"]
-        self.participant.vars["random_indexes"] = [np.random.choice(list(range(0,5))),
-                                                   np.random.choice(list(range(5,10))),
-                                                   np.random.choice(list(range(10,15))),
-                                                   np.random.choice(list(range(15,20))),
-                                                   20]
+        #randomizer
+        rand = sample(list(range(0,20)),4)
+        rand.append(20)
+        self.participant.vars["random_indexes"] = rand
         self.participant.vars["displayed_lotteries"] = list(self.participant.vars["prospect_table"].loc[self.participant.vars["random_indexes"],"Index"])
         self.participant.vars["displayed_prospects"] = self.participant.vars["prospect_table"].loc[self.participant.vars["random_indexes"],:]
         self.displayed_lotteries = str(list(self.participant.vars["displayed_lotteries"]))
@@ -62,6 +62,8 @@ class Player(BasePlayer):
             df.loc[i,"A_or_B"] = np.random.choice(["A","B"], p=[df.loc[i,"p1"],df.loc[i,"p2"]])
             df.loc[i,"payoff"] = df.loc[i,"x1"] * df.loc[i,"Allocation"] if df.loc[i,"A_or_B"] == "A" else df.loc[i,"x2"] * df.loc[i,"Allocation"]
         self.payoff_thisround = int(df[["payoff"]].sum())
+        if self.training_round == False:
+            self.participant.vars["payoff_vector"].append(self.payoff_thisround)
         self.participant.vars["prospect_table"].update(df)
         for i in range(0,len(self.participant.vars["prospect_table"])):
             if self.participant.vars["prospect_table"].loc[i,"A_or_B"] != "X":
@@ -78,6 +80,7 @@ class Player(BasePlayer):
     endowment = models.IntegerField()
     payoff_thisround = models.IntegerField()
     displayed_lotteries = models.StringField()
+    training_round = models.BooleanField()
 
     Lotere_A = models.IntegerField(min=0, max=10, initial=0)
     Lotere_B = models.IntegerField(min=0, max=10, initial=0)

@@ -56,6 +56,8 @@ class No4Purchase(Page):
     def vars_for_template(self):
         p = self.participant.vars["displayed_prospects"]
         return {
+            'rand_index': self.participant.vars["random_indexes"],
+            'payoff_vector': self.participant.vars["payoff_vector"],
             'endowment': self.session.config["endowment"],
             'training': self.round_number <= self.session.config["training_rounds"],
             'training_round': self.round_number,
@@ -66,6 +68,8 @@ class No4Purchase(Page):
             'lot_4': p.iloc[3,2],'gain_A_4': p.iloc[3,3],'prob_A_4': p.iloc[3,4],'gain_B_4': p.iloc[3,5],'prob_B_4': p.iloc[3,6],'rel_4': p.iloc[3,7],
             'lot_5': p.iloc[4,2],'gain_A_5': p.iloc[4,3],'prob_A_5': p.iloc[4,4],'gain_B_5': p.iloc[4,5],'prob_B_5': p.iloc[4,6],'rel_5': p.iloc[4,7],
             'df': self.participant.vars["prospect_table"],
+            'pagehold_timer': self.session.config['submit_delay'],
+            'pagehold_timer_ths': self.session.config['submit_delay'] * 1000,
         }
 
     form_model = 'player'
@@ -76,7 +80,7 @@ class No4Purchase(Page):
 
     def error_message(self, values):
         if values['Lotere_A'] + values['Lotere_B'] + values['Lotere_C'] + values['Lotere_D'] + values['Lotere_E'] > self.session.config["endowment"]:
-            return 'Total alokasi untuk seluruh alternatif harus tidak lebih dari ' + str(self.session.config["endowment"]) + " poin."
+            return 'Total alokasi untuk seluruh alternatif tidak boleh lebih dari ' + str(self.session.config["endowment"]) + " poin!"
 
     def before_next_page(self):
         return {self.player.payoff_realizer()}
