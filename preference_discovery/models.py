@@ -45,7 +45,6 @@ class Player(BasePlayer):
         elif self.round_number == self.session.config["training_rounds"] + 1:
             self.participant.vars["prospect_table"] = Constants.prospects
             self.endowment = self.session.config["endowment"]
-            self.participant.vars["payoff_vector"] = []
         self.participant.vars["random_indexes"] = [np.random.choice(list(range(0,5))),
                                                    np.random.choice(list(range(5,10))),
                                                    np.random.choice(list(range(10,15))),
@@ -63,8 +62,6 @@ class Player(BasePlayer):
             df.loc[i,"A_or_B"] = np.random.choice(["A","B"], p=[df.loc[i,"p1"],df.loc[i,"p2"]])
             df.loc[i,"payoff"] = df.loc[i,"x1"] * df.loc[i,"Allocation"] if df.loc[i,"A_or_B"] == "A" else df.loc[i,"x2"] * df.loc[i,"Allocation"]
         self.payoff_thisround = int(df[["payoff"]].sum())
-        if self.round_number > self.session.config["training_rounds"]:
-            self.participant.vars["payoff_vector"] = self.participant.vars["payoff_vector"].append(int(df[["payoff"]].sum()))
         self.participant.vars["prospect_table"].update(df)
         for i in range(0,len(self.participant.vars["prospect_table"])):
             if self.participant.vars["prospect_table"].loc[i,"A_or_B"] != "X":

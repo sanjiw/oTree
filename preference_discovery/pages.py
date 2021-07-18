@@ -42,7 +42,9 @@ class No3Start(Page):
 
     def vars_for_template(self):
         return {
-            'round': self.round_number
+            'training': self.round_number <= self.session.config["training_rounds"],
+            'training_round': self.round_number,
+            'round': self.round_number - self.session.config["training_rounds"],
         }
 
 
@@ -55,13 +57,15 @@ class No4Purchase(Page):
         p = self.participant.vars["displayed_prospects"]
         return {
             'endowment': self.session.config["endowment"],
-            'round': self.round_number,
+            'training': self.round_number <= self.session.config["training_rounds"],
+            'training_round': self.round_number,
+            'round': self.round_number - self.session.config["training_rounds"],
             'lot_1': p.iloc[0,2],'gain_A_1': p.iloc[0,3],'prob_A_1': p.iloc[0,4],'gain_B_1': p.iloc[0,5],'prob_B_1': p.iloc[0,6],'rel_1': p.iloc[0,7],
             'lot_2': p.iloc[1,2],'gain_A_2': p.iloc[1,3],'prob_A_2': p.iloc[1,4],'gain_B_2': p.iloc[1,5],'prob_B_2': p.iloc[1,6],'rel_2': p.iloc[1,7],
             'lot_3': p.iloc[2,2],'gain_A_3': p.iloc[2,3],'prob_A_3': p.iloc[2,4],'gain_B_3': p.iloc[2,5],'prob_B_3': p.iloc[2,6],'rel_3': p.iloc[2,7],
             'lot_4': p.iloc[3,2],'gain_A_4': p.iloc[3,3],'prob_A_4': p.iloc[3,4],'gain_B_4': p.iloc[3,5],'prob_B_4': p.iloc[3,6],'rel_4': p.iloc[3,7],
             'lot_5': p.iloc[4,2],'gain_A_5': p.iloc[4,3],'prob_A_5': p.iloc[4,4],'gain_B_5': p.iloc[4,5],'prob_B_5': p.iloc[4,6],'rel_5': p.iloc[4,7],
-            'df': self.participant.vars["prospect_table"]
+            'df': self.participant.vars["prospect_table"],
         }
 
     form_model = 'player'
@@ -86,7 +90,9 @@ class No5Result(Page):
     def vars_for_template(self):
         df = self.participant.vars["displayed_prospects"][["x1","x2","Allocation","A_or_B","payoff"]]
         return {
-            'round': self.round_number,
+            'training': self.round_number <= self.session.config["training_rounds"],
+            'training_round': self.round_number,
+            'round': self.round_number - self.session.config["training_rounds"],
             'A1': df.iloc[0, 0], 'B1': df.iloc[0, 1], 'C1': df.iloc[0, 2], 'D1': df.iloc[0, 3], 'E1': df.iloc[0, 4],
             'A2': df.iloc[1, 0], 'B2': df.iloc[1, 1], 'C2': df.iloc[1, 2], 'D2': df.iloc[1, 3], 'E2': df.iloc[1, 4],
             'A3': df.iloc[2, 0], 'B3': df.iloc[2, 1], 'C3': df.iloc[2, 2], 'D3': df.iloc[2, 3], 'E3': df.iloc[2, 4],
