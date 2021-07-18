@@ -19,10 +19,11 @@ class No2Instructions1(Page):
         return self.round_number == 1
 
     def vars_for_template(self):
-        p = Constants.prospects
-        p_display = p.to_html()
         return {
-            'table' : p_display
+            'endowment': self.session.config["endowment"],
+            'instrument' : "preference_discovery/SC1.jpg",
+            'result': "preference_discovery/SC2.jpg",
+            'show_up_fee': int(self.session.config["participation_fee"]),
         }
 
 class No2Instructions2(Page):
@@ -39,6 +40,11 @@ class No3Start(Page):
     def before_next_page(self):
         return {self.player.set_player_param()}
 
+    def vars_for_template(self):
+        return {
+            'round': self.round_number
+        }
+
 
 class No4Purchase(Page):
 
@@ -48,6 +54,8 @@ class No4Purchase(Page):
     def vars_for_template(self):
         p = self.participant.vars["displayed_prospects"]
         return {
+            'endowment': self.session.config["endowment"],
+            'round': self.round_number,
             'lot_1': p.iloc[0,2],'gain_A_1': p.iloc[0,3],'prob_A_1': p.iloc[0,4],'gain_B_1': p.iloc[0,5],'prob_B_1': p.iloc[0,6],'rel_1': p.iloc[0,7],
             'lot_2': p.iloc[1,2],'gain_A_2': p.iloc[1,3],'prob_A_2': p.iloc[1,4],'gain_B_2': p.iloc[1,5],'prob_B_2': p.iloc[1,6],'rel_2': p.iloc[1,7],
             'lot_3': p.iloc[2,2],'gain_A_3': p.iloc[2,3],'prob_A_3': p.iloc[2,4],'gain_B_3': p.iloc[2,5],'prob_B_3': p.iloc[2,6],'rel_3': p.iloc[2,7],
@@ -62,6 +70,10 @@ class No4Purchase(Page):
         fields = ['Lotere_A', 'Lotere_B', 'Lotere_C', 'Lotere_D', 'Lotere_E']
         return fields
 
+    def error_message(self, values):
+        if values['Lotere_A'] + values['Lotere_B'] + values['Lotere_C'] + values['Lotere_D'] + values['Lotere_E'] > self.session.config["endowment"]:
+            return 'Total alokasi untuk seluruh alternatif harus tidak lebih dari ' + str(self.session.config["endowment"]) + " poin."
+
     def before_next_page(self):
         return {self.player.payoff_realizer()}
 
@@ -74,6 +86,7 @@ class No5Result(Page):
     def vars_for_template(self):
         df = self.participant.vars["displayed_prospects"][["x1","x2","Allocation","A_or_B","payoff"]]
         return {
+            'round': self.round_number,
             'A1': df.iloc[0, 0], 'B1': df.iloc[0, 1], 'C1': df.iloc[0, 2], 'D1': df.iloc[0, 3], 'E1': df.iloc[0, 4],
             'A2': df.iloc[1, 0], 'B2': df.iloc[1, 1], 'C2': df.iloc[1, 2], 'D2': df.iloc[1, 3], 'E2': df.iloc[1, 4],
             'A3': df.iloc[2, 0], 'B3': df.iloc[2, 1], 'C3': df.iloc[2, 2], 'D3': df.iloc[2, 3], 'E3': df.iloc[2, 4],

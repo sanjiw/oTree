@@ -24,7 +24,6 @@ class Constants(BaseConstants):
     name_in_url = 'preference_discovery_v2'
     players_per_group = None
     num_rounds = 20
-    table = 'preference_discovery/Float-Table.html'
     with open('preference_discovery/Lottery.csv', encoding="utf-8") as file:
         prospects = pd.read_csv(file)
 
@@ -42,6 +41,7 @@ class Player(BasePlayer):
     def set_player_param(self):
         if self.round_number == 1:
             self.participant.vars["prospect_table"] = Constants.prospects
+            self.endowment = self.session.config["endowment"]
         else:
             pass
         self.participant.vars["random_indexes"] = [np.random.choice(list(range(0,5))),
@@ -74,6 +74,7 @@ class Player(BasePlayer):
                 pass
         self.participant.vars["displayed_prospects"] = df
 
+    endowment = models.IntegerField()
     payoff_thisround = models.IntegerField()
     displayed_lotteries = models.StringField()
 
