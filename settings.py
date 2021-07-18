@@ -35,6 +35,7 @@ SESSION_CONFIGS = [
         num_demo_participants=1,
         app_sequence=['preference_discovery'],
         endowment=3,
+        training_rounds=3,
         rounds=10,
     ),
 ]

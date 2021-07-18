@@ -26,10 +26,10 @@ class No2Instructions1(Page):
             'show_up_fee': int(self.session.config["participation_fee"]),
         }
 
-class No2Instructions2(Page):
+class No2Warning(Page):
 
     def is_displayed(self):
-        return self.round_number == 1
+        return self.round_number == self.session.config["training_rounds"] + 1
 
 
 class No3Start(Page):
@@ -110,7 +110,7 @@ class No6EndResult(Page):
 
 page_sequence = [No1Introduction,
                  No2Instructions1,
-                 No2Instructions2,
+                 No2Warning,
                  No3Start,
                  No4Purchase,
                  No5Result,
